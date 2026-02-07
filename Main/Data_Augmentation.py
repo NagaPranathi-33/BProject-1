@@ -1,9 +1,10 @@
 import random
 import numpy as np
 import itertools
+from Main.runtime_config import AUGMENT_TOTAL_INSTANCES
 
 def data_aug(input_data, clas):  # oversampling
-    total_instance = 25000  # total number of required rows
+    total_instance = AUGMENT_TOTAL_INSTANCES  # configurable total number of required rows
     input_data = list(itertools.chain(*input_data))
     clas = list(itertools.chain(*clas))
 

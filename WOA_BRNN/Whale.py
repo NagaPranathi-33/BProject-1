@@ -1,11 +1,12 @@
 import random
 import math
 import numpy as np
+from Main.runtime_config import WOA_MAX_ITER, WOA_POPULATION
 
 def algm():
     lb, ub = 1, 20
-    N, M = 20, 10
-    Max_iter = 2
+    N, M = WOA_POPULATION, 10
+    Max_iter = WOA_MAX_ITER
 
     def bound(value):
         value = int(value)

@@ -14,13 +14,14 @@ import logging
 logging.getLogger('tensorflow').disabled = True
 import warnings
 warnings.filterwarnings("ignore")
+from Main.runtime_config import DRN_EPOCHS
 
 
 def classify(x_train, y_train, x_test):
 
     # Setting Training Hyperparameters
     batch_size = 128  # original ResNet paper uses batch_size = 128 for training
-    epochs = 2
+    epochs = DRN_EPOCHS
     data_augmentation = True
     num_classes = 10
     # Data Preprocessing

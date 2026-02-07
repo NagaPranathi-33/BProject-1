@@ -9,6 +9,7 @@ warnings.filterwarnings("ignore")
 logging.getLogger('tensorflow').setLevel(logging.FATAL)
 from sklearn.model_selection import train_test_split
 from WOA_BRNN import Whale
+from Main.runtime_config import BRNN_EPOCHS
 
 def prediction(trainX, trainY, testX, y_test):
     trainX = np.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
@@ -36,7 +37,7 @@ def prediction(trainX, trainY, testX, y_test):
     brnn.set_weights(updated_weights)
 
     # Train model
-    brnn.fit(trainX, trainY, epochs=5, batch_size=10, verbose=0)
+    brnn.fit(trainX, trainY, epochs=BRNN_EPOCHS, batch_size=10, verbose=0)
     Predict = brnn.predict(testX)
     return Predict
 
