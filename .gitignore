@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+.env
+.DS_Store
+# Exclude large data files exceeding GitHub limits
+*.csv
+*.npy
+*.png
