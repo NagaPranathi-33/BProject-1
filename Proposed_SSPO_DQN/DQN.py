@@ -8,6 +8,7 @@ from tensorflow.keras.utils import to_categorical
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from Proposed_SSPO_DQN import SSPO
+from Main.runtime_config import DQN_EPOCHS
 
 # Constants
 DISCOUNT = 0.99
@@ -95,7 +96,7 @@ class DQNAgent:
 
         # Train model (guard batch_size <= dataset size)
         safe_batch = min(1000, max(1, int(len(train_x))))
-        model.fit(train_x, train_y, epochs=5, batch_size=safe_batch, verbose=0)
+        model.fit(train_x, train_y, epochs=DQN_EPOCHS, batch_size=safe_batch, verbose=0)
 
         # Predict and append class indices to pred list
         predictions = np.argmax(model.predict(test_x, verbose=0), axis=1)

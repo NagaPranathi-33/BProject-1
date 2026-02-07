@@ -2,6 +2,7 @@
 from numpy import exp, array, random, dot, tanh
 from sklearn.model_selection import train_test_split
 import numpy as np
+from Main.runtime_config import HYBRID_NN_ITERS
 
 # Class to create a neural
 # network with single neuron
@@ -61,7 +62,7 @@ def classify(x1, y1,tr, A,Tpr,Tnr):
     train_outputs = np.array([y_train.tolist()]).T
 
     neural_network = NeuralNetwork(len(train_inputs[0]))
-    neural_network.train(train_inputs, train_outputs, 10000)
+    neural_network.train(train_inputs, train_outputs, HYBRID_NN_ITERS)
 
     # Test the neural network with a new situation.
     pred = neural_network.forward_propagation(test_inputs)

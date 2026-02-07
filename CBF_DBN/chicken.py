@@ -1,8 +1,9 @@
 import random, math, numpy as np
+from Main.runtime_config import CHICKEN_MAX_GENERATION
 
 def algm():
     Final_best = []
-    Max_Generation = 20
+    Max_Generation = CHICKEN_MAX_GENERATION
     N = 4          # row size
     D = 5           # column size
     G = 2           # time step between(2, 20)

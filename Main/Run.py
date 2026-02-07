@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # Now import  
 
 from Main import Preprocessing, read, Spark
+from Main.runtime_config import FAST_MODE
 import Adaptive_EBat_DBN.DBN, CBF_DBN.DBN, WOA_BRNN.brnn, Hybrid_NN.Hybrid_NN
 def callmain(dts,tr): # dataset, training data(%)
     A,Tpr,Tnr=[],[],[]
@@ -31,6 +32,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # Now import  
 
 from Main import Preprocessing, read, Spark
+from Main.runtime_config import FAST_MODE
 import Adaptive_EBat_DBN.DBN, CBF_DBN.DBN, WOA_BRNN.brnn, Hybrid_NN.Hybrid_NN
 def callmain(dts,tr): # dataset, training data(%)
     A,Tpr,Tnr=[],[],[]
@@ -56,10 +58,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import required modules
 from Main import Preprocessing, read, Spark
+from Main.runtime_config import FAST_MODE
 import Adaptive_EBat_DBN.DBN, CBF_DBN.DBN, WOA_BRNN.brnn, Hybrid_NN.Hybrid_NN
 
 def callmain(dts, tr):  # dataset, training data(%)
     A, Tpr, Tnr = [], [], []
+
+    mode = "FAST" if FAST_MODE else "FULL"
+    print(f"\nRuntime mode: {mode}")
 
     # ✅ Ensure the correct preprocessing step
     print("\nPerforming Box-Cox transformation...")
