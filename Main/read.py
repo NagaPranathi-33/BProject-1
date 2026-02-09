@@ -1,69 +1,81 @@
 import csv
-import sys
 import os
-import pandas as pd
-# # Add the project root directory to sys.path
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-# # Now import  
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PREPROCESSED_DIR = os.path.join(BASE_DIR, "Preprocessed")
+
+
+def _candidate_files(data, suffix=""):
+    return [
+        os.path.join(PREPROCESSED_DIR, f"{data}{suffix}.csv"),
+        os.path.join(PREPROCESSED_DIR, f"Preprocessed_{data}{suffix}.csv"),
+    ]
+
+
+def _first_existing(paths):
+    for path in paths:
+        if os.path.exists(path):
+            return path
+    return None
+
 
 def read_data(data):
-    #Read data from the csv file
-    #file_name = "Preprocessed//Preprocessed_"+data+".csv"                  #dataset location
-    base_dir = os.path.dirname(os.path.abspath(__file__))  # Get the current script directory
-    file_name = os.path.join(base_dir, "Preprocessed", f"{data}.csv")  
+    # Read data from the csv file
+    file_name = _first_existing(_candidate_files(data))
+    if file_name is None:
+        raise FileNotFoundError(
+            f"Data file not found for '{data}'. Looked in: {_candidate_files(data)}"
+        )
+
     datas = []
-    with open(file_name, 'rt')as f:
-        content = csv.reader(f)                        #read csv content
-        for rows in content:                           #row of data
+    with open(file_name, "rt") as f:
+        content = csv.reader(f)
+        for rows in content:
             tem = []
-            for cols in rows:                          
-                #tem.append(float(cols))
-                if cols == '' or cols.isspace():
-                    tem.append(0.0)  # or use np.nan if your model handles missing values
+            for cols in rows:
+                if cols == "" or cols.isspace():
+                    tem.append(0.0)
                 else:
-                    #tem.append(float(cols))  
                     try:
                         tem.append(float(cols))
                     except ValueError:
-                        # Replace missing or invalid values with 0 (or any appropriate default)
-                        tem.append(0.0)          
-            datas.append(tem)                         
-    if data=='Adult':
-        d = len(datas)//3
+                        tem.append(0.0)
+            datas.append(tem)
+
+    if data == "Adult":
+        d = len(datas) // 3
         datas = datas[:d]
     return datas
 
 
-
-
 def read_label(data):
     """Reads label data from a CSV file."""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    file_name = os.path.join(base_dir, "Preprocessed", f"{data}.csv")  
-    
-    # ✅ Check if file exists before proceeding
-    if not os.path.exists(file_name):
-        print(f"❌ Error: Label file '{data}.csv' not found in 'Preprocessed' folder.")
+    # Primary: explicit label file.
+    file_name = _first_existing(_candidate_files(data, "_label"))
+
+    # Backward compatibility fallback: older code may have only one file.
+    if file_name is None:
+        file_name = _first_existing(_candidate_files(data))
+
+    if file_name is None:
+        print(f"❌ Error: Label file '{data}_label.csv' not found in 'Preprocessed' folder.")
         return None
 
     datas = []
-    
     try:
-        with open(file_name, 'rt') as f:
-            content = csv.reader(f)  # Read CSV content
-            
+        with open(file_name, "rt") as f:
+            content = csv.reader(f)
             for rows in content:
-                if not rows:  # ✅ Skip empty rows
+                if not rows:
                     continue
+                value = rows[0] if file_name.endswith("_label.csv") else rows[-1]
                 try:
-                    # ✅ Convert values safely and handle errors
-                    datas.append(int(float(rows[0])))  
+                    datas.append(int(float(value)))
                 except ValueError:
                     print(f"⚠️ Warning: Skipping invalid label value: {rows}")
                     continue
 
-        # ✅ Handle dataset-specific slicing (if needed)
-        if data == 'Adult':
+        if data == "Adult":
             d = len(datas) // 3
             datas = datas[:d]
 
