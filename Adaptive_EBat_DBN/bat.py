@@ -9,6 +9,7 @@ import random
 # # Now import 
 
 '''from Adaptive_EBat_DBN.BatAlgorithm import *
+from Main.runtime_config import BAT_POPULATION, BAT_ITERATIONS
 
 def Fun(D, sol):
     val = 0.0
@@ -26,6 +27,7 @@ def algm():
 
 import numpy as np
 from Adaptive_EBat_DBN.BatAlgorithm import *
+from Main.runtime_config import BAT_POPULATION, BAT_ITERATIONS
 
 def Fun(D, sol):
     """Objective function for optimization"""
@@ -35,7 +37,7 @@ def Fun(D, sol):
 def algm():
     """Runs Bat Algorithm and returns optimized weight matrix."""
     try:
-        Algorithm = BatAlgorithm(10, 40, 1000, 0.5, 0.5, 0.0, 2.0, -10.0, 10.0, Fun)
+        Algorithm = BatAlgorithm(10, BAT_POPULATION, BAT_ITERATIONS, 0.5, 0.5, 0.0, 2.0, -10.0, 10.0, Fun)
         best = Algorithm.move_bat()  # Best solution from bat algorithm
         
         # ✅ Ensure best is an array

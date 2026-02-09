@@ -1,5 +1,34 @@
 import os
-os.makedirs("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed", exist_ok=True)
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PREPROCESSED_DIR = os.path.join(BASE_DIR, "Preprocessed")
+os.makedirs(PREPROCESSED_DIR, exist_ok=True)
+
+
+def _dataset_candidates(dts):
+    return [
+        os.path.join(BASE_DIR, "dataset", f"{dts}.csv"),
+        os.path.join(BASE_DIR, "Datasets", f"{dts}.csv"),
+        os.path.join(BASE_DIR, "datasets", f"{dts}.csv"),
+    ]
+
+
+def resolve_dataset_csv(dts):
+    # Keep explicit alias for legacy naming used by 7817_1_cleaned pathing.
+    alias = {
+        "7817_1_cleaned": "Amazon_Reviews",
+    }
+    names = [dts]
+    if dts in alias:
+        names.append(alias[dts])
+
+    for name in names:
+        for candidate in _dataset_candidates(name):
+            if os.path.exists(candidate):
+                return candidate
+
+    search = ", ".join(_dataset_candidates(dts))
+    raise FileNotFoundError(f"Dataset CSV not found for {dts}. Looked in: {search}")
 import pandas as pd
 import numpy as np
 from scipy.stats import boxcox
@@ -39,7 +68,7 @@ def preprocessing(dts):
 
     def string_conversion(dts):
         # filename = 'dataset/' + dts + '.csv'  # dataset path
-        filename = '/content/drive/MyDrive/BProject1/146203/Main/dataset/' + dts + '.csv'
+        filename = resolve_dataset_csv(dts)
         def load_csv(filename):  # read csv file
             dataset = list()
             with open(filename, 'r') as file:
@@ -183,13 +212,13 @@ def preprocessing(dts):
                 if len(numeric_vals) == 0:
                     continue
 
-            mean_val = np.mean(numeric_vals)
+                mean_val = np.mean(numeric_vals)
 
-            # Replace empty or non-numeric entries with mean
-            for row in range(rows):
-                val = data[row][col].strip()
-                if val == '' or not is_number(val):
-                    data[row][col] = str(mean_val)
+                # Replace empty or non-numeric entries with mean
+                for row in range(rows):
+                    val = data[row][col].strip()
+                    if val == '' or not is_number(val):
+                        data[row][col] = str(mean_val)
 
             return data.tolist()
 
@@ -212,8 +241,8 @@ def preprocessing(dts):
             clas = find_class(Z,dts) # Class labels
             # np.savetxt("Preprocessed//" + dts + ".csv", datas, delimiter=',', fmt='%s')
             # np.savetxt("Preprocessed//" + dts + "_label.csv", clas, delimiter=',', fmt='%s')
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + ".csv", datas, delimiter=',', fmt='%s')
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + "_label.csv", clas, delimiter=',', fmt='%s')
+            np.savetxt(os.path.join(PREPROCESSED_DIR, dts + ".csv"), datas, delimiter=',', fmt='%s')
+            np.savetxt(os.path.join(PREPROCESSED_DIR, dts + "_label.csv"), clas, delimiter=',', fmt='%s')
 
         if dts == 'Credit_Approval':
             ind = [0,3,4, 5, 6, 8, 9, 11,12]  # ind = index value of string format in Adult dataset
@@ -227,8 +256,8 @@ def preprocessing(dts):
             datas = Z[:, 0:len(Z[0]) - 1]  # slicing data
             datas = find_missing(datas)  # Find the missing value
             clas = find_class(Z,dts)  # Class labels
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + ".csv", datas, delimiter=',', fmt='%s')
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + "_label.csv", clas, delimiter=',', fmt='%s')
+            np.savetxt(os.path.join(PREPROCESSED_DIR, dts + ".csv"), datas, delimiter=',', fmt='%s')
+            np.savetxt(os.path.join(PREPROCESSED_DIR, dts + "_label.csv"), clas, delimiter=',', fmt='%s')
 
         # if dts == '7817_1_cleaned':
         #     ind = [2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 18, 19, 20, 22, 23, 24, 26]  # categorical string indices
@@ -248,8 +277,8 @@ def preprocessing(dts):
         #     datas = find_missing(datas)       # apply missing value fix only to numeric-convertible features
         #     clas = find_class(Z, dts)
 
-        #     np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + ".csv", datas, delimiter=',', fmt='%s')
-        #     np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + "_label.csv", clas, delimiter=',', fmt='%s')
+        #     np.savetxt(os.path.join(PREPROCESSED_DIR, dts + ".csv"), datas, delimiter=',', fmt='%s')
+        #     np.savetxt(os.path.join(PREPROCESSED_DIR, dts + "_label.csv"), clas, delimiter=',', fmt='%s')
         
         if dts == 'CreditCard':
             X = np.array(X).T
@@ -273,9 +302,9 @@ def preprocessing(dts):
             datas = find_missing(datas)
             clas = Z[:, -1]
 
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/CreditCard.csv",
+            np.savetxt(os.path.join(PREPROCESSED_DIR, "CreditCard.csv"),
                    datas, delimiter=',', fmt='%s')
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/CreditCard_label.csv",
+            np.savetxt(os.path.join(PREPROCESSED_DIR, "CreditCard_label.csv"),
                    clas, delimiter=',', fmt='%s')
             return
         # elif dts.lower() == 'creditcard':
@@ -319,7 +348,7 @@ def preprocessing(dts):
 
         elif dts == '7817_1_cleaned':
             # Read CSV
-            df = pd.read_csv("/content/drive/MyDrive/BProject1/146203/Main/Datasets/Amazon_Reviews.csv")
+            df = pd.read_csv(resolve_dataset_csv(dts))
 
             # Drop completely irrelevant or unique identifier columns
             df.drop(columns=['id', 'asins', 'keys', 'ean', 'upc', 'reviews doRecommend'], inplace=True)
@@ -342,15 +371,15 @@ def preprocessing(dts):
                 df[col] = str_convert(df[col].values, unique_vals)
 
             # Final data preparation
-                datas = df.drop(columns=['reviews rating']).values  # input features
-                clas = df['reviews rating'].values  # target/label
+            datas = df.drop(columns=['reviews rating']).values  # input features
+            clas = df['reviews rating'].values  # target/label
 
             # Save the preprocessed data
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + ".csv", datas, delimiter=',', fmt='%s')
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/" + dts + "_label.csv", clas, delimiter=',', fmt='%s')
+            np.savetxt(os.path.join(PREPROCESSED_DIR, dts + ".csv"), datas, delimiter=',', fmt='%s')
+            np.savetxt(os.path.join(PREPROCESSED_DIR, dts + "_label.csv"), clas, delimiter=',', fmt='%s')
         elif dts == 'adult_UCI':
             ind = [1, 3, 5, 6, 7, 8, 9, 13]  # adjust these based on adult_UCI column types
-            filename = '/content/drive/MyDrive/BProject1/146203/Main/dataset/adult_UCI.csv'
+            filename = resolve_dataset_csv(dts)
     
             data = load_csv(filename)
             X = np.array(data[1:])  # skip header row
@@ -368,9 +397,9 @@ def preprocessing(dts):
             clas = find_class(Z, dts)  # you may need to modify this for adult_UCI labels
     
             # Save the preprocessed files
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/adult_UCI.csv",
+            np.savetxt(os.path.join(PREPROCESSED_DIR, "adult_UCI.csv"),
                datas, delimiter=',', fmt='%s')
-            np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/adult_UCI_label.csv",
+            np.savetxt(os.path.join(PREPROCESSED_DIR, "adult_UCI_label.csv"),
                clas, delimiter=',', fmt='%s')
                
         # datas = convert(datas)
@@ -397,7 +426,9 @@ def preprocessing(dts):
         box_cox.append(transformed_data)
 
     box_cox = np.array(box_cox).T           # Transpose back
-    np.savetxt("/content/drive/MyDrive/BProject1/146203/Main/Preprocessed/Preprocessed_" + dts + ".csv",
+    np.savetxt(os.path.join(PREPROCESSED_DIR, "Preprocessed_" + dts + ".csv"),
+           box_cox, delimiter=',', fmt='%s')
+    np.savetxt(os.path.join(PREPROCESSED_DIR, dts + ".csv"),
            box_cox, delimiter=',', fmt='%s')
 
     # data = string_conversion(dts)

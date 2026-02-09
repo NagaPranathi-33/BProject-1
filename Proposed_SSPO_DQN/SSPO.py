@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from Main.runtime_config import SSPO_STUDENTS, SSPO_ITERATIONS
 
 def algm(total_weights=100):  # Accept number of weights from outside
     def fitness_fn(pop):
@@ -8,9 +9,9 @@ def algm(total_weights=100):  # Accept number of weights from outside
     def initialize_population(pop_size, num_weights):
         return [np.random.uniform(-1, 1, num_weights).tolist() for _ in range(pop_size)]
 
-    student = 10  # Population size
+    student = SSPO_STUDENTS  # Population size
     var = total_weights  # Number of weights to optimize
-    Max_iteration = 10  # Maximum iterations
+    Max_iteration = SSPO_ITERATIONS  # Maximum iterations
 
     # Initialize the population
     x = initialize_population(student, var)
